@@ -14,54 +14,79 @@ class Event < ActiveRecord::Base
     future_events_ordered
   end
 
-  # def self.view_current_events(t)
-  #   t = t.upcase
-  #   time = Time.new()
-  #   case t
-  #   when 'D'
-  #     #this_day = Time.strftime("%Y-%m-%d 00:00")
-  #     events = Event.where(:start.strftime("%Y-%m-%d 00:00") == time.strftime("%Y-%m-%d 00:00"))
-  #   when 'W'
-  #     #this_week = Time.strftime("%Y %U")
-  #     events = Event.where(DateTime.parse('start').to_time.strftime("%Y %U") == time.strftime("%Y %U"))
-  #   when 'M'
-  #     this_month = Time.strftime("%Y-%m")
-  #     events = Event.where(:start.this_month == time.this_month)
-  #   else
-  #     events = []
-  #   end
-  #   events
-  # end
+  #def next_events(t)
 
-  def self.view_current_events(t)
+  def self.todays_events(events, time)
+    Event.all.each do |e|
+      if e.start.strftime("%Y %m %d") == time.strftime("%Y %m %d")
+        events << e
+      end
+    end
+    events
+  end
+
+  def self.this_weeks_events(events, time)
+    Event.all.each do |e|
+      if e.start.strftime("%Y %U") == time.strftime("%Y %U")
+        events << e
+      end
+    end
+    events
+  end
+
+  def self.this_months_events(events, time)
+    Event.all.each do |e|
+      if e.start.month == time.month
+        events << e
+      end
+    end
+    events
+  end
+
+  def self.next_days_events(events, day)
+    todays_events(events, day + 1.day)
+  end
+
+  def self.next_weeks_events(events, week)
+    this_weeks_events(events, week + 1.week)
+  end
+
+  def self.next_months_events(events, month)
+    Event.this_months_events(events, month + 1.month)
+  end
+
+  def self.current_events(t)
     t = t.upcase
     time = Time.now
-    events = []
     case t
     when 'D'
-      Event.all.each do |e|
-        #puts "#{e.start.strftime("%Y %m %d")} ******* #{time.strftime("%Y %m %d")}"
-        if e.start.strftime("%Y %m %d") == time.strftime("%Y %m %d")
-          events << e
-        end
-      end
+      events = Event.todays_events([], time)
     when 'W'
-      Event.all.each do |e|
-        if e.start.strftime("%Y %U") == time.strftime("%Y %U")
-          events << e
-        end
-      end
+      events = Event.this_weeks_events([], time)
     when "M"
-      Event.all.each do |e|
-        if e.start.month == time.month
-          events << e
-        end
-      end
+      events = Event.this_months_events([], time)
     else
       events = []
     end
     events
   end
+
+  def self.next_events(events, time, t)
+    t = t.upcase
+    case t
+    when 'D'
+      events = Event.next_days_events(events, time)
+    when 'W'
+      events = Event.next_weeks_events(events, time)
+    when 'M'
+      events = Event.next_months_events(events, time)
+    else
+      events = []
+    end
+    events
+  end
+
+
 
 
 end

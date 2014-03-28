@@ -21,6 +21,7 @@ def events_menu
     puts "1 - to create events"
     puts "2 - to edit events"
     puts "3 - to delete events"
+    puts "4 - to View Events by Time Unit"
     puts "0 - to Quit"
     choice = gets.chomp.to_i
     puts choice
@@ -32,6 +33,8 @@ def events_menu
       edit_events
     when 3
       delete_events
+    when 4
+      view_events
     else
       if choice != 0
         puts "Invalid Option"
@@ -131,6 +134,49 @@ def list_events
     puts "#{i + 1}: #{e.description}\n\tLocation: #{e.location}\n\tStarts: #{e.start}\tEnds: #{e.end}\n\n"
   end
 end
+
+def view_events
+  system 'clear'
+  time = Time.new
+  puts "[D] By Day."
+  puts "[W] By Week."
+  puts "[M] By Month."
+  choice = gets.chomp.upcase
+  case choice
+  when 'D'
+    events = current_events(choice)
+    puts "Date: #{time.strftime("%b %d %Y")}"
+    events.each do |e|
+      e.showme
+      puts "\n"
+    end
+  when 'W'
+    events = current_events(choice)
+    puts "Week: #{time.strftime("%U")}"
+    events.each do |e|
+      e.showme
+      puts "\n"
+    end
+  when 'M'
+    events = current_events(choice)
+    puts "Month: #{time.strftime("%b of %Y")}"
+    events.each do |e|
+      e.showme
+      puts "\n"
+    end
+  else
+    puts "Invalid Input"
+    view_events
+    break
+  end
+  view_more_events(time, choice)
+end
+
+def view_more_events(time, unit)
+  puts "Where do you want to go to now?"
+end
+
+
 
 
 start_menu
